@@ -31,13 +31,21 @@ def get_openai_key(config):
     return key
 
 app = Flask(__name__)
-# Restrict CORS to the local frontend dev origins only — a wildcard origin here
-# would let any website the user visits read/write this local API (it can send
-# real emails and holds the Gmail app password + resume/profile data).
-CORS(app, origins=[
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-])
+
+
+def get_cors_origins():
+    """Return allowed frontend origins from CORS_ORIGINS or local defaults."""
+    raw = os.getenv("CORS_ORIGINS", "").strip()
+    if raw:
+        return [origin.strip() for origin in raw.split(",") if origin.strip()]
+    return [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ]
+
+
+# Restrict CORS to trusted frontend origins only.
+CORS(app, origins=get_cors_origins())
 
 UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -1489,4 +1497,6 @@ def campaign_bounces(campaign_id):
 if __name__ == "__main__":
     init_db()
     load_config()  # Ensure config.json exists
-    app.run(debug=True, use_reloader=False, port=5000)
+    port = int(os.getenv("PORT", "5000"))
+    debug = os.getenv("FLASK_DEBUG", "0") == "1"
+    app.run(host="0.0.0.0", debug=debug, use_reloader=False, port=port)
