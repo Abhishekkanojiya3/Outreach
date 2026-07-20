@@ -123,9 +123,19 @@ Use the app UI to configure:
 - Profile details
 - Resume upload
 
+For deployed backend hosting, set these environment variables on the backend service:
+- `DATABASE_URL`
+- `OPENAI_API_KEY`
+- `GMAIL_ADDRESS`
+- `GMAIL_APP_PASSWORD`
+- `TRACKING_BASE_URL`
+- `CORS_ORIGINS`
+- `SEND_DELAY_SECONDS`
+
 ## Notes
 
 - The backend stores data locally in SQLite by default.
+- In production, set `DATABASE_URL` to use Postgres instead of SQLite.
 - Uploaded resumes and local config live inside `backend/`.
 - For production hosting, deploy the frontend and backend separately.
 

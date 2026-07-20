@@ -1474,10 +1474,7 @@ def inbox_status():
 
 @app.route("/api/campaign/<int:campaign_id>/bounces", methods=["GET"])
 def campaign_bounces(campaign_id):
-    from db import get_db
-    conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute("""
+    rows = query_db("""
         SELECT id, email, name, reply_status,
                error_message, status_updated_at
         FROM recipients
@@ -1485,10 +1482,7 @@ def campaign_bounces(campaign_id):
         AND reply_status = 'invalid_email'
         AND (error_message LIKE '%bounce%' OR error_message LIKE '%does not exist%')
     """, (campaign_id,))
-    rows = cursor.fetchall()
-    columns = [d[0] for d in cursor.description]
-    conn.close()
-    return jsonify([dict(zip(columns, row)) for row in rows])
+    return jsonify(rows)
 
 
 # ─── App Startup ──────────────────────────────────────────────────────────────

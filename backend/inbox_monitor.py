@@ -8,6 +8,11 @@ from openai import OpenAI
 
 OPENAI_MODEL = "gpt-4o-mini"
 
+
+def row_to_dict(row) -> dict:
+    """Convert SQLite or Postgres row objects to a plain dict."""
+    return dict(row)
+
 def get_imap_connection(gmail_address: str, app_password: str) -> imaplib.IMAP4_SSL:
     """Connect to Gmail via IMAP using App Password."""
     mail = imaplib.IMAP4_SSL("imap.gmail.com", 993)
@@ -166,8 +171,7 @@ def find_recipient_by_email(conn, email_address: str) -> dict | None:
     """, (email_address.strip(),))
     row = cursor.fetchone()
     if row:
-        columns = [d[0] for d in cursor.description]
-        return dict(zip(columns, row))
+        return row_to_dict(row)
     return None
 
 def find_recipient_by_ooo_sender(conn, sender_email: str) -> dict | None:
@@ -200,7 +204,7 @@ def apply_ooo_update(conn, recipient_id: int, return_date: str | None) -> None:
     # Only update if currently no_reply — respect manual status updates
     cursor.execute("SELECT reply_status FROM recipients WHERE id = ?", (recipient_id,))
     row = cursor.fetchone()
-    if not row or row[0] != "no_reply":
+    if not row or row_to_dict(row).get("reply_status") != "no_reply":
         return
 
     cursor.execute("""

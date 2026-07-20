@@ -5,3 +5,4 @@ pdfplumber
 apscheduler
 requests
 gunicorn
+psycopg2-binary
