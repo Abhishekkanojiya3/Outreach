@@ -128,6 +128,8 @@ For deployed backend hosting, set these environment variables on the backend ser
 - `OPENAI_API_KEY`
 - `GMAIL_ADDRESS`
 - `GMAIL_APP_PASSWORD`
+- `SMTP_HOST`
+- `SMTP_PORT`
 - `TRACKING_BASE_URL`
 - `CORS_ORIGINS`
 - `SEND_DELAY_SECONDS`
@@ -136,6 +138,7 @@ For deployed backend hosting, set these environment variables on the backend ser
 
 - The backend stores data locally in SQLite by default.
 - In production, set `DATABASE_URL` to use Postgres instead of SQLite.
+- Gmail SMTP uses port `587` by default. Free Render web services block outbound SMTP, so use a paid Render instance for Gmail SMTP or switch email sending to an HTTP email API provider.
 - Uploaded resumes and local config live inside `backend/`.
 - For production hosting, deploy the frontend and backend separately.
 

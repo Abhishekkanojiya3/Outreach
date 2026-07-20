@@ -4,6 +4,7 @@ Supports plain text emails with PDF attachment and thread continuity headers.
 """
 
 import smtplib
+import socket
 import os
 import html as html_lib
 from email.mime.multipart import MIMEMultipart
@@ -12,8 +13,9 @@ from email.mime.base import MIMEBase
 from email import encoders
 from email.utils import make_msgid, formatdate
 
-SMTP_HOST = "smtp.gmail.com"
-SMTP_PORT = 587  # TLS
+SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")
+SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))  # STARTTLS
+SMTP_TIMEOUT = int(os.getenv("SMTP_TIMEOUT", "30"))
 
 
 def _body_to_html(body, tracking_pixel_url=None):
@@ -106,9 +108,18 @@ def send_email(
             )
             msg.attach(part)
 
-    with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
-        server.starttls()
-        server.login(sender_email, app_password)
-        server.sendmail(sender_email, recipient_email, msg.as_string())
+    try:
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=SMTP_TIMEOUT) as server:
+            server.starttls()
+            server.login(sender_email, app_password)
+            server.sendmail(sender_email, recipient_email, msg.as_string())
+    except OSError as e:
+        if getattr(e, "errno", None) == 101:
+            raise RuntimeError(
+                "Email server is unreachable from this host. Render free web services "
+                "block outbound SMTP ports 25, 465, and 587, so Gmail SMTP requires "
+                "a paid Render instance or an HTTP email API provider."
+            ) from e
+        raise
 
     return message_id
