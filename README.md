@@ -1,119 +1,141 @@
-# Outreach Tool 🚀
+# Outreach
 
-A powerful, local-first personal email outreach tool that generates unique, human-sounding personalized emails using the OpenAI API and sends them via Gmail SMTP with automated resume attachments.
+A full-stack outreach CRM for creating campaigns, generating personalized emails with AI, sending them through Gmail SMTP, and tracking replies, opens, follow-ups, and inbox activity.
 
-**Single-user • Localhost-only • Privacy-focused**
----
-## Demo
+This repo is organized as a monorepo:
+- `frontend/` contains the React + Vite UI
+- `backend/` contains the Flask + SQLite API
 
-<video width="630" height="300" src="https://github.com/user-attachments/assets/da78db07-0ccb-463e-ad02-e3029b84d825"></video>
+## What It Does
 
+- Create campaigns from pasted email lists or extracted PDF/XLSX files
+- Generate personalized outreach emails in parallel with AI
+- Attach resumes automatically when sending
+- Send follow-ups in threaded conversations
+- Track opens with a lightweight pixel endpoint
+- Monitor inbox replies, bounces, and out-of-office messages
+- Search across campaigns and contacts
+- Detect duplicate contacts before outreach
+- Block domains you do not want to contact again
+- Surface dashboard stats for campaigns, replies, and opens
 
+## Features
 
+### Campaign workflow
+- Campaign creation with name, goal, context, and send limits
+- Import emails from plain text, PDF, or XLSX files
+- Duplicate checking before sending
+- Re-engagement candidate finder
 
----
+### AI generation
+- Parallel generation of customized outreach drafts
+- Context-aware follow-up generation
+- Resume-aware personalization
 
-## ✨ Key Features
+### Sending and tracking
+- Gmail SMTP sending with app passwords
+- Resume attachment support
+- Follow-up sending with reply threading
+- Open tracking via public tracking pixel
+- Reply status tracking for interested, check-back, no reply, and invalid email
 
-- **Parallel Email Generation**: Leverages multi-threading (`ThreadPoolExecutor`) to generate multiple personalized drafts simultaneously, significantly reducing wait times.
-- **Live Progress Tracking**: Real-time visual feedback via a dedicated progress bar UI. Monitor successes, failures, and individual error messages as they happen.
-- **Gmail SMTP Integration**: Securely send emails using Gmail App Passwords. Supports automated resume attachments (PDF) and threaded follow-ups.
-- **Intelligent Personalization**: Powered by OpenAI (`gpt-4o-mini`), tailoring every email to the lead's profile and your custom campaign goal.
-- **Lightweight CRM**: Manage leads, track campaign status, and handle threaded follow-ups from a unified dashboard.
-- **Local-First Privacy**: Your leads, email drafts, and API keys are stored locally in a SQLite database and an encrypted config file.
+### CRM and analytics
+- Campaign dashboard
+- Search across contacts and campaigns
+- Contact history view
+- Open and reply stats
+- Blocked domain management
 
----
+## Tech Stack
 
-## 🛠️ Tech Stack
+### Frontend
+- React 18
+- Vite
+- React Router
+- Axios
+- Tailwind CSS
 
-- **Backend**: Python 3.11+, Flask (REST API), SQLite (Database), APScheduler.
-- **Frontend**: React 18, Vite, Tailwind CSS v3, React Router v6.
-- **AI Inference**: OpenAI SDK (`gpt-4o-mini`).
-- **Automation**: Multi-threaded generation workers.
+### Backend
+- Python 3.11+
+- Flask
+- SQLite
+- APScheduler
+- OpenAI SDK
+- PDF parsing and email extraction helpers
 
----
+## Project Structure
 
-## 📋 Prerequisites
+```text
+Outreach/
+  backend/
+  frontend/
+  start-tracking.ps1
+  README.md
+```
 
-- **Python**: 3.11 or higher.
-- **Node.js**: 18.x or higher.
-- **Gmail Account**: Must have [2-Step Verification](https://myaccount.google.com/security) enabled.
-- **OpenAI API Key**: A key from the [OpenAI Platform](https://platform.openai.com/api-keys).
+## Local Setup
 
----
+### 1. Clone the repo
 
-## 🚀 Getting Started
-
-### 1. Clone the Repository
 ```bash
 git clone git@github.com:Abhishekkanojiya3/Outreach.git
 cd Outreach
 ```
 
-### 2. Backend Setup
+### 2. Backend setup
+
 ```bash
 cd backend
 python -m venv venv
-# Windows:
+
+# Windows
 .\venv\Scripts\activate
-# Linux/macOS:
+
+# macOS / Linux
 source venv/bin/activate
 
 pip install -r requirements.txt
 python app.py
 ```
-*The server will start on `http://localhost:5000`.*
 
-### 3. Frontend Setup
+The backend runs on `http://localhost:5000`.
+
+### 3. Frontend setup
+
+Open a new terminal:
+
 ```bash
-cd ../frontend
+cd frontend
 npm install
 npm run dev
 ```
-*The application will be available at `http://localhost:5173`.*
 
----
+The frontend runs on `http://localhost:5173`.
 
-## ⚙️ Configuration
+## Configuration
 
-No manual file editing is required. All configuration is handled through the application UI:
+Use the app UI to configure:
+- Gmail address
+- Gmail app password
+- OpenAI API key
+- Send delay
+- Tracking base URL
+- Profile details
+- Resume upload
 
-1.  **Profile Page**: Fill in your personal details (Name, College, Skills, Bio) and upload your Resume (PDF). Don't forget to parse your resume. This data is used by the AI to personalize your outreach mails.
-2.  **Settings Page**:
-    - **Gmail**: Enter your Gmail address and **App Password** (see below).
-    - **API Key**: Add your OpenAI API key to enable email generation, resume parsing, and inbox monitoring.
-    - **Delay**: Configure the send delay (default 60s) to comply with Gmail's sending limits.
+## Notes
 
-### 🔑 Getting a Gmail App Password
-1.  Go to [Google Account Security](https://myaccount.google.com/security).
-2.  Navigate to **2-Step Verification** > **App Passwords**.
-3.  Generate a new app password for "Mail".
-4.  Copy the 16-character code into the Settings page.
+- The backend stores data locally in SQLite by default.
+- Uploaded resumes and local config live inside `backend/`.
+- For production hosting, deploy the frontend and backend separately.
 
----
+## Recommended Deployment
 
-## 🏗️ Architecture Overview
+- Frontend: Vercel or Netlify
+- Backend: Render, Railway, or a small Python host
 
-### Data Flow
-```mermaid
-graph LR
-    UI[React Frontend] <--> API[Flask Backend]
-    API <--> DB[(SQLite DB)]
-    API <--> OpenAI[OpenAI AI Worker]
-    API <--> SMTP[Gmail SMTP]
-```
+If you want persistent data in production, move the SQLite database to Postgres and store uploads in persistent storage.
 
-- **Frontend**: A SPA built with React that polls the backend for real-time progress updates during generation.
-- **Backend**: A Flask application that manages a thread pool for parallel AI requests.
-- **Database**: SQLite stores all lead information, campaign history, and email templates.
-- **In-Memory Progress**: Generation status is tracked in real-time, allowing the UI to show instant feedback.
+## License
 
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request or open an issue for bugs and feature requests.
-
-## 📄 License
-
-This project is licensed under the MIT License.
+MIT
