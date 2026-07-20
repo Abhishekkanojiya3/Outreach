@@ -1,0 +1,17 @@
+# Backend
+backend/config.json
+backend/outreach.db
+backend/uploads/
+backend/venv/
+backend/*.log
+__pycache__/
+*.pyc
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/*.log
+
+# OS
+.DS_Store
+Thumbs.db
