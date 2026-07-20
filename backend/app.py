@@ -1480,8 +1480,8 @@ def campaign_bounces(campaign_id):
         FROM recipients
         WHERE campaign_id = ?
         AND reply_status = 'invalid_email'
-        AND (error_message LIKE '%bounce%' OR error_message LIKE '%does not exist%')
-    """, (campaign_id,))
+        AND (error_message LIKE ? OR error_message LIKE ?)
+    """, (campaign_id, "%bounce%", "%does not exist%"))
     return jsonify(rows)
 
 

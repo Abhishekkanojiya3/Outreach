@@ -32,7 +32,9 @@ def _translate_sql(query):
         "SUBSTR(email, INSTR(email, '@') + 1)",
         "SPLIT_PART(email, '@', 2)",
     )
-    return translated.replace("?", "%s")
+    translated = translated.replace("%", "%%")
+    translated = translated.replace("?", "%s")
+    return translated
 
 
 class PostgresCursor:
