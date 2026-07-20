@@ -3,6 +3,7 @@ Configuration management for the outreach tool.
 Loads/saves config.json with defaults for profile, credentials, and settings.
 """
 
+import copy
 import json
 import os
 
@@ -29,31 +30,58 @@ DEFAULT_CONFIG = {
     "resume_parsed": {}
 }
 
+ENV_VAR_MAP = {
+    "gmail_address": "GMAIL_ADDRESS",
+    "gmail_app_password": "GMAIL_APP_PASSWORD",
+    "openai_api_key": "OPENAI_API_KEY",
+    "send_delay_seconds": "SEND_DELAY_SECONDS",
+    "tracking_base_url": "TRACKING_BASE_URL",
+}
+
 
 def load_config():
     """Load config from disk. Create with defaults if missing."""
     if not os.path.exists(CONFIG_PATH):
         save_config(DEFAULT_CONFIG)
-        return DEFAULT_CONFIG.copy()
-
-    with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-        config = json.load(f)
+        config = DEFAULT_CONFIG.copy()
+    else:
+        with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+            config = json.load(f)
 
     # Merge with defaults to handle missing keys after upgrades
-    merged = DEFAULT_CONFIG.copy()
+    merged = copy.deepcopy(DEFAULT_CONFIG)
     merged.update(config)
     if "profile" in config:
         merged_profile = DEFAULT_CONFIG["profile"].copy()
         merged_profile.update(config["profile"])
         merged["profile"] = merged_profile
 
+    # Environment variables take precedence over the local config file.
+    for config_key, env_name in ENV_VAR_MAP.items():
+        env_value = os.getenv(env_name, "").strip()
+        if env_value:
+            if config_key == "send_delay_seconds":
+                try:
+                    merged[config_key] = max(20, min(90, int(env_value)))
+                except ValueError:
+                    pass
+            else:
+                merged[config_key] = env_value
+
     return merged
 
 
 def save_config(config):
     """Persist config to disk."""
+    payload = copy.deepcopy(config)
+
+    # Do not write secret values back to disk if Render env vars are set.
+    for config_key, env_name in ENV_VAR_MAP.items():
+        if os.getenv(env_name, "").strip():
+            payload.pop(config_key, None)
+
     with open(CONFIG_PATH, "w", encoding="utf-8") as f:
-        json.dump(config, f, indent=2)
+        json.dump(payload, f, indent=2)
 
 
 def is_profile_complete(config):
