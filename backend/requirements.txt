@@ -4,3 +4,4 @@ openai
 pdfplumber
 apscheduler
 requests
+gunicorn

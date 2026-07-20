@@ -1494,9 +1494,11 @@ def campaign_bounces(campaign_id):
 # ─── App Startup ──────────────────────────────────────────────────────────────
 
 
+init_db()
+load_config()  # Ensure config.json exists
+
+
 if __name__ == "__main__":
-    init_db()
-    load_config()  # Ensure config.json exists
     port = int(os.getenv("PORT", "5000"))
     debug = os.getenv("FLASK_DEBUG", "0") == "1"
     app.run(host="0.0.0.0", debug=debug, use_reloader=False, port=port)
