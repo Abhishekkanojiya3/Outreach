@@ -128,6 +128,7 @@ For deployed backend hosting, set these environment variables on the backend ser
 - `OPENAI_API_KEY`
 - `GMAIL_ADDRESS`
 - `GMAIL_APP_PASSWORD`
+- `BREVO_API_KEY`
 - `SMTP_HOST`
 - `SMTP_PORT`
 - `TRACKING_BASE_URL`
@@ -138,7 +139,8 @@ For deployed backend hosting, set these environment variables on the backend ser
 
 - The backend stores data locally in SQLite by default.
 - In production, set `DATABASE_URL` to use Postgres instead of SQLite.
-- Gmail SMTP uses port `587` by default. Free Render web services block outbound SMTP, so use a paid Render instance for Gmail SMTP or switch email sending to an HTTP email API provider.
+- Set `BREVO_API_KEY` in production to send emails through Brevo's HTTPS API on Render free services.
+- Gmail SMTP uses port `587` by default. Free Render web services block outbound SMTP, so use Brevo API or a paid Render instance for Gmail SMTP.
 - Uploaded resumes and local config live inside `backend/`.
 - For production hosting, deploy the frontend and backend separately.
 
