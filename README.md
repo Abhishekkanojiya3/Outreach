@@ -93,8 +93,10 @@ On Windows PowerShell:
 This starts:
 - Backend at `http://localhost:5000`
 - Frontend at `http://localhost:5173`
+- A Cloudflare tunnel for open tracking, when `cloudflared` is installed
 
 The frontend hot-reloads automatically. The backend restarts automatically when Python files change.
+Keep the backend and tunnel running while sending emails if you want open tracking to update.
 
 ### Manual backend setup
 
