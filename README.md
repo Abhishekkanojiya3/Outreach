@@ -82,7 +82,21 @@ git clone git@github.com:Abhishekkanojiya3/Outreach.git
 cd Outreach
 ```
 
-### 2. Backend setup
+### 2. One-command local start
+
+On Windows PowerShell:
+
+```powershell
+.\start-local.ps1
+```
+
+This starts:
+- Backend at `http://localhost:5000`
+- Frontend at `http://localhost:5173`
+
+The frontend hot-reloads automatically. The backend restarts automatically when Python files change.
+
+### Manual backend setup
 
 ```bash
 cd backend
@@ -100,7 +114,7 @@ python app.py
 
 The backend runs on `http://localhost:5000`.
 
-### 3. Frontend setup
+### Manual frontend setup
 
 Open a new terminal:
 

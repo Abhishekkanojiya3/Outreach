@@ -118,13 +118,23 @@ def scheduled_inbox_check():
     finally:
         conn.close()
 
-# Start scheduler when app starts
-scheduler = BackgroundScheduler()
-scheduler.add_job(scheduled_inbox_check, 'interval', minutes=10, id='inbox_monitor')
-scheduler.start()
+def should_start_scheduler():
+    """Avoid starting background jobs in Flask's reloader parent process."""
+    if os.getenv("DISABLE_SCHEDULER", "0") == "1":
+        return False
+    if os.getenv("FLASK_RELOAD", "0") == "1":
+        return os.getenv("WERKZEUG_RUN_MAIN") == "true"
+    return True
 
-import atexit
-atexit.register(lambda: scheduler.shutdown(wait=False))
+
+scheduler = None
+if should_start_scheduler():
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(scheduled_inbox_check, 'interval', minutes=10, id='inbox_monitor')
+    scheduler.start()
+
+    import atexit
+    atexit.register(lambda: scheduler.shutdown(wait=False))
 
 
 # ─── Profile Routes ──────────────────────────────────────────────────────────
@@ -1495,4 +1505,5 @@ load_config()  # Ensure config.json exists
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "5000"))
     debug = os.getenv("FLASK_DEBUG", "0") == "1"
-    app.run(host="0.0.0.0", debug=debug, use_reloader=False, port=port)
+    reload = os.getenv("FLASK_RELOAD", "0") == "1"
+    app.run(host="0.0.0.0", debug=debug, use_reloader=reload, port=port)
